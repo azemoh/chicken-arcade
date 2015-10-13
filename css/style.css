@@ -5,6 +5,39 @@ body {
 	background: #f9f9f9;
 }
 
-canvas {
+div {
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	-ms-box-sizing: border-box;
+}
+
+#game {
+	width: 505px;
+	margin: 0 auto;
 	box-shadow: 0 0 8px #ccc;
+}
+
+#score,
+#game-over {
+	font-weight: 700;
+	position: relative;
+}
+
+#score {
+	color: #FFF;
+	font-size: 30px;
+	margin-bottom: -40px;
+	line-height: 1;
+	padding: 10px 20px 0 0;
+	text-transform: uppercase;
+	text-align: right;
+}
+
+#game-over {
+	font-size: 42px;
+	margin-top: -180px;
+	color: #f00;
+	background: #ccc;
+	padding: 30px 0;
 }

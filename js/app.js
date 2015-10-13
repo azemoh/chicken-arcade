@@ -1,27 +1,25 @@
-var enemyCount = 5,
-		ENEMY_INIT_X = -200,
-		MOVE_X = 101,
-		MOVE_Y = 83,
-		PLAYER_INIT_X = 202,
-		PLAYER_INIT_Y = 422,
-		lifeCount = 4,
-		ENTITY_HEIGHT = 50,
-		ENTITY_WIDTH = 90,
-		CANVAS_OFFSET = 90,
-		CANVAS_WIDTH = 505,
-		CANVAS_HEIGHT = 586;
+var ENEMY_COUNT = 5,
+	LIFE_COUNT = 4,
+	ENEMY_INIT_X = -200,
+	MOVE_X = 101,
+	MOVE_Y = 83,
+	PLAYER_INIT_X = 202,
+	PLAYER_INIT_Y = 422,
+	ENTITY_HEIGHT = 50,
+	ENTITY_WIDTH = 90,
+	CANVAS_OFFSET = 90,
+	CANVAS_WIDTH = 505,
+	CANVAS_HEIGHT = 586;
 
 var sprites = {
 	player: 'images/chicken.png',
 	playerDead: 'images/chicken-dead.png',
 	enemy1: 'images/enemy-car-1.png',
 	enemy2: 'images/enemy-car-2.png',
-	enemy3: 'images/enemy-car-3.png',
+	enemy3: 'images/enemy-car-3.png'
 };
 
-/**
-* Helper functions
-*/
+//Helper functions
 
 var randomNo = function () {
 	return Math.floor((Math.random() * 300) + 50);
@@ -31,6 +29,9 @@ var random_Y = function () {
 	return CANVAS_OFFSET + Math.floor(Math.random() * 3) * MOVE_Y;
 };
 
+/* Helper function to return random enemy images.
+ * return: string
+ */
 var randomEnemyImage = function () {
 	var sprite = Math.random();
 	
@@ -45,8 +46,8 @@ var randomEnemyImage = function () {
 	return sprite;
 };
 
-
-// Enemies entity
+/* Enemy class to create enemy instances
+ */
 var Enemy = function () {
 	this.sprite = randomEnemyImage();
 	this.y = random_Y();
@@ -56,15 +57,16 @@ var Enemy = function () {
 	this.speed = randomNo();
 };
 
-// Update the enemy's position, required method for game
-// Parameter: dt, a time delta between ticks
+/* Update the enemy's position
+ * param: dt, a time delta between ticks
+ */
 Enemy.prototype.update = function (dt) {
 	// x is multiplied by the dt parameter
 	// which ensures the game runs at the same speed for all computers.
-	
 	this.x = this.x + this.speed * dt;
-	
-	if (this.x > CANVAS_WIDTH ) {
+	// Return enemy to the start when they go out of screen
+	// Change enemy image, speed and y position.
+	if (this.x > CANVAS_WIDTH) {
 		this.x = ENEMY_INIT_X;
 		this.sprite = randomEnemyImage();
 		this.speed = randomNo();
@@ -72,14 +74,17 @@ Enemy.prototype.update = function (dt) {
 	}
 };
 
-// Draw the enemy on the screen, required method for game
+// Draw the enemy on the screen
 Enemy.prototype.render = function () {
 	ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
+/* Static function to create enemies
+ * return: Enemy[]
+ */
 Enemy.createEnemies = function () {
 	var enemies = [];
-	for (var i = 0; i < enemyCount; i++ ) {
+	for (var i = 0; i < ENEMY_COUNT; i++ ) {
 		var enemy = new Enemy();
 		enemies.push(enemy)
 	}
@@ -95,7 +100,8 @@ var Player = function () {
 	this.y = PLAYER_INIT_Y;
 	this.height = ENTITY_HEIGHT;
 	this.width = ENTITY_WIDTH;
-	this.lives = lifeCount;
+	this.lives = LIFE_COUNT;
+	this.score = 0;
 };
 
 
@@ -112,6 +118,8 @@ Player.prototype.reset = function () {
 };
 
 Player.prototype.win = function () {
+	this.score += 10;
+	game.updateScore();
 	this.reset();
 };
 
@@ -167,14 +175,14 @@ Player.prototype.update = function (key) {
 var Life = function (x) {
 	this.sprite = 'images/heart.png';
 	this.x = x;
-	this.y = -10;
+	this.y = -8;
 	this.width = 101/3;
 	this.height = 171/3;
 };
 
 Life.addLives = function () {
 	var lives = [];
-	for (var i = 0; i < lifeCount; i++) {
+	for (var i = 0; i < LIFE_COUNT; i++) {
 		lives.push(new Life(10 + i * 40));
 	}
 	return lives;
@@ -185,7 +193,7 @@ Life.prototype.render = function() {
 };
 
 // This listens for key presses and sends the keys to your
-// Player.handleInput() method. You don't need to modify this.
+// Player.update() method. You don't need to modify this.
 document.addEventListener('keyup', function (e) {
 	var allowedKeys = {
 		32: 'space',
@@ -198,22 +206,47 @@ document.addEventListener('keyup', function (e) {
 	player.update(allowedKeys[e.keyCode]);
 });
 
-// create player
-var player = new Player();
 
 var game = {
+	screen : document.getElementById('game'),
 	enemies: Enemy.createEnemies(),
 	lives: Life.addLives(),
 	isOn: true
 };
 
+var	scoreBoard = document.createElement('div'),
+	gameOverBanner = document.createElement('div');
+
+
+game.init = function () {
+	gameOverBanner.innerHTML = 'Game Over! <br> Hit space to try again.';
+	gameOverBanner.id = 'game-over';
+	scoreBoard.id = 'score';
+	
+	this.updateScore();
+	this.screen.appendChild(scoreBoard);
+};
+
+game.updateScore = function () {
+	scoreBoard.innerHTML = 'Score: ' + player.score;
+}
+
 game.over = function () {
+	this.screen.appendChild(gameOverBanner);
 	this.enemies = [];
 };
 
 game.reset = function () {
+	this.screen.removeChild(gameOverBanner);
 	player.reset();
-	player.lives = lifeCount;
-	game.enemies = Enemy.createEnemies();
-	game.lives = Life.addLives();
+	player.lives = LIFE_COUNT;
+	player.score = 0;
+	this.updateScore()
+	this.enemies = Enemy.createEnemies();
+	this.lives = Life.addLives();
 };
+
+
+// create player
+var player = new Player();
+game.init();

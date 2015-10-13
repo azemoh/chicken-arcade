@@ -15,6 +15,7 @@
  */
 
 var Engine = (function (global) {
+	"use strict";
 	/* Predefine the variables we'll be using within this scope,
 	 * create the canvas element, grab the 2D context for that canvas
 	 * set the canvas elements height/width and add it to the DOM.
@@ -27,7 +28,7 @@ var Engine = (function (global) {
 
 	canvas.width = CANVAS_WIDTH;
 	canvas.height = CANVAS_HEIGHT;
-	doc.body.appendChild(canvas);
+	game.screen.appendChild(canvas);
 
 	/* This function serves as the kickoff point for the game loop itself
 	 * and handles properly calling the update and render methods.
@@ -64,7 +65,6 @@ var Engine = (function (global) {
 	 * game loop.
 	 */
 	function init() {
-		reset();
 		lastTime = Date.now();
 		main();
 	}
@@ -78,11 +78,6 @@ var Engine = (function (global) {
 	 * functionality this way (you could just implement collision detection
 	 * on the entities themselves within your app.js file).
 	 */
-	function update(dt) {
-		updateEntities(dt);
-		checkCollisions();
-	}
-
 	function checkCollisions() {
 		game.enemies.forEach(function (enemy) {
 
@@ -96,6 +91,12 @@ var Engine = (function (global) {
 
 		});
 	}
+	
+	function update(dt) {
+		updateEntities(dt);
+		checkCollisions();
+	}
+
 
 	/* This is called by the update function  and loops through all of the
 	 * objects within your game.enemies array as defined in app.js and calls
@@ -122,13 +123,13 @@ var Engine = (function (global) {
 		 * for that particular row of the game level.
 		 */
 		var rowImages = [
-                'images/city.png', // Top row is water
-                'images/road.png', // Row 1 of 3 of stone
-                'images/road-lines.png', // Row 1 of 3 of stone
-                'images/road.png', // Row 1 of 3 of stone
-                'images/stone-block.png', // Row 1 of 2 of grass
-                'images/stone-block.png' // Row 2 of 2 of grass
-            ],
+				'images/city.png', // Top row is water
+				'images/road.png', // Row 1 of 3 of stone
+				'images/road-lines.png', // Row 1 of 3 of stone
+				'images/road.png', // Row 1 of 3 of stone
+				'images/stone-block.png', // Row 1 of 2 of grass
+				'images/stone-block.png' // Row 2 of 2 of grass
+			],
 			numRows = 6,
 			numCols = 5,
 			row, col;
@@ -173,31 +174,23 @@ var Engine = (function (global) {
 		player.render();
 	}
 
-	/* This function does nothing but it could have been a good place to
-	 * handle game reset states - maybe a new game menu or a game over screen
-	 * those sorts of things. It's only called once by the init() method.
-	 */
-	function reset() {
-		// noop
-	}
-
 	/* Go ahead and load all of the images we know we're going to need to
 	 * draw our game level. Then set init as the callback method, so that when
 	 * all of these images are properly loaded our game will start.
 	 */
 	Resources.load([
-			  'images/city.png',
-        'images/road.png',
-        'images/road-lines.png',
-        'images/road.png',
-        'images/stone-block.png',
-        'images/enemy-car-1.png',
-        'images/enemy-car-2.png',
-        'images/enemy-car-3.png',
-        'images/chicken.png',
-        'images/chicken-dead.png',
-        'images/heart.png'
-    ]);
+		'images/city.png',
+		'images/road.png',
+		'images/road-lines.png',
+		'images/road.png',
+		'images/stone-block.png',
+		'images/enemy-car-1.png',
+		'images/enemy-car-2.png',
+		'images/enemy-car-3.png',
+		'images/chicken.png',
+		'images/chicken-dead.png',
+		'images/heart.png'
+	]);
 	Resources.onReady(init);
 
 	/* Assign the canvas' context object to the global variable (the window
