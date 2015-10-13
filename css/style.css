@@ -1,0 +1,10 @@
+body {
+	font-family: "Raleway", Calibri, sans-serif;
+	text-align: center;
+	margin: 0;
+	background: #f9f9f9;
+}
+
+canvas {
+	box-shadow: 0 0 8px #ccc;
+}
