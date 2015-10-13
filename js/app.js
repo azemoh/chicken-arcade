@@ -1,3 +1,5 @@
+"use strict";
+
 var ENEMY_COUNT = 5,
 	LIFE_COUNT = 4,
 	ENEMY_INIT_X = -200,
@@ -9,7 +11,7 @@ var ENEMY_COUNT = 5,
 	ENTITY_WIDTH = 90,
 	CANVAS_OFFSET = 90,
 	CANVAS_WIDTH = 505,
-	CANVAS_HEIGHT = 586;
+	CANVAS_HEIGHT = 584;
 
 var sprites = {
 	player: 'images/chicken.png',
@@ -25,6 +27,9 @@ var randomNo = function () {
 	return Math.floor((Math.random() * 300) + 50);
 };
 
+/* Helper function to place enemies at random Y positions
+ * return: float
+ */
 var random_Y = function () {
 	return CANVAS_OFFSET + Math.floor(Math.random() * 3) * MOVE_Y;
 };
@@ -91,9 +96,8 @@ Enemy.createEnemies = function () {
 	return enemies;
 };
 
-// Now write your own player class
-// This class requires an update(), render() and
-// a handleInput() method.
+/* Player class to create player entities
+ */
 var Player = function () {
 	this.sprite = sprites.player;
 	this.x = PLAYER_INIT_X;
@@ -104,12 +108,12 @@ var Player = function () {
 	this.score = 0;
 };
 
-
+// Draw player on the screen
 Player.prototype.render = function () {
 	ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
-// Bring player to initial position
+// Return player to initial position
 Player.prototype.reset = function () {
 	game.isOn = true;
 	this.x = PLAYER_INIT_X;
@@ -117,13 +121,16 @@ Player.prototype.reset = function () {
 	this.sprite = sprites.player;
 };
 
+// When player crosses the road
 Player.prototype.win = function () {
 	this.score += 10;
 	game.updateScore();
 	this.reset();
 };
 
-// Player dies and looses 1 life
+/* Player dies and looses 1 life,
+ * also check if player still have lives.
+ */
 Player.prototype.die = function () {
 	game.isOn = false;
 	
@@ -141,6 +148,9 @@ Player.prototype.die = function () {
 	}
 };
 
+/* handle key input and update player position
+ * param: key@string
+ */
 Player.prototype.update = function (key) {
 	
 	if (game.isOn) {
@@ -161,17 +171,20 @@ Player.prototype.update = function (key) {
 				if (this.x > CANVAS_WIDTH - this.width) this.x = CANVAS_WIDTH - MOVE_X;
 				break;
 		}
-
+		// player gets to the top
 		if (this.y < CANVAS_OFFSET) {
 			this.win()
 		}
+		
 	} else if (key == 'space') {
 		game.isOn = true;
 		game.reset();
 	}
 	
 };
-
+/* Life class to create life instances
+ * param: x@float
+ */
 var Life = function (x) {
 	this.sprite = 'images/heart.png';
 	this.x = x;
@@ -180,6 +193,9 @@ var Life = function (x) {
 	this.height = 171/3;
 };
 
+/* Static function to create life instances
+ * return: Life[]
+ */
 Life.addLives = function () {
 	var lives = [];
 	for (var i = 0; i < LIFE_COUNT; i++) {
@@ -188,12 +204,14 @@ Life.addLives = function () {
 	return lives;
 };
 
+// Draw lives on the screen
 Life.prototype.render = function() {
   ctx.drawImage(Resources.get(this.sprite), this.x, this.y, this.width, this.height);
 };
 
-// This listens for key presses and sends the keys to your
-// Player.update() method. You don't need to modify this.
+/* This listens for key presses and sends the keys to
+ * Player.update() method
+ */
 document.addEventListener('keyup', function (e) {
 	var allowedKeys = {
 		32: 'space',
@@ -206,38 +224,46 @@ document.addEventListener('keyup', function (e) {
 	player.update(allowedKeys[e.keyCode]);
 });
 
-
+// Initialize the game
 var game = {
-	screen : document.getElementById('game'),
 	enemies: Enemy.createEnemies(),
 	lives: Life.addLives(),
 	isOn: true
 };
 
-var	scoreBoard = document.createElement('div'),
+var gameScreen = document.createElement('div'),
+	scoreBoard = document.createElement('div'),
 	gameOverBanner = document.createElement('div');
 
-
+// Run the game
 game.init = function () {
+	gameScreen.id = 'game';
+	gameScreen.style.height = CANVAS_HEIGHT + 'px';
+	gameScreen.style.width = CANVAS_WIDTH + 'px';
+	document.body.appendChild(gameScreen);
+	
 	gameOverBanner.innerHTML = 'Game Over! <br> Hit space to try again.';
 	gameOverBanner.id = 'game-over';
 	scoreBoard.id = 'score';
 	
 	this.updateScore();
-	this.screen.appendChild(scoreBoard);
+	gameScreen.appendChild(scoreBoard);
 };
 
+// Update scoreboard
 game.updateScore = function () {
 	scoreBoard.innerHTML = 'Score: ' + player.score;
-}
+};
 
+// Game Over function
 game.over = function () {
-	this.screen.appendChild(gameOverBanner);
+	gameScreen.appendChild(gameOverBanner);
 	this.enemies = [];
 };
 
+// Reset game
 game.reset = function () {
-	this.screen.removeChild(gameOverBanner);
+	gameScreen.removeChild(gameOverBanner);
 	player.reset();
 	player.lives = LIFE_COUNT;
 	player.score = 0;
@@ -246,7 +272,6 @@ game.reset = function () {
 	this.lives = Life.addLives();
 };
 
-
-// create player
+// create player instance
 var player = new Player();
 game.init();
