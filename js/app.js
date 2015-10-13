@@ -121,9 +121,9 @@ Player.prototype.die = function () {
 	
 	this.lives -= 1;
 	game.lives.pop();
+	this.sprite = sprites.playerDead;
 	
 	if(this.lives > 0) {
-		this.sprite = sprites.playerDead;
 		var player = this;
 		setTimeout(function () {
 			player.reset()
