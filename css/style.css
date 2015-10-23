@@ -8,7 +8,7 @@ body {
 .rules { padding: 15px 0}
 .rules h2 { margin: 0; }
 
-div, canvas {
+div, canvas, aside {
 	box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
@@ -40,4 +40,30 @@ div, canvas {
 	color: #f00;
 	background: #ccc;
 	padding: 30px 0;
+}
+
+
+/* Social buttons */
+.social-share {
+	display: -webkit-box;
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-flex-direction: column;
+	-ms-flex-direction: column;
+	flex-direction: column;
+	-webkit-align-items: center;
+	-moz-align-items: center;
+	-ms-align-items: center;
+	-o-align-items: center;
+	align-items: center;
+	position: fixed;
+	padding: 10px 5px;
+	border-radius: 4px;
+	border: 1px solid #eee;
+	right: 20px;
+	top: 150px;
+	width: 88px;
+	background: #fff;
+	box-shadow: 0 0 4px #ddd;
 }
